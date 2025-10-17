@@ -19,7 +19,7 @@
 # - A fork of the daxlib repository under your account
 # - A Personal Access Token (PAT) saved as DAXLIBFORK_PAT in repository secrets
 
-name: publish-package
+name: publish-abcclassification
 
 on:
   workflow_dispatch:
