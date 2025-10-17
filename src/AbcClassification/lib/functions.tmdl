@@ -112,4 +112,4 @@ function 'DaxPatterns.AbcClassification.ItemsInClass' = ```
         ```
     annotation DAXLIB_PackageId = DaxPatterns.AbcClassification
 
-    annotation DAXLIB_PackageVersion = 0.1.2
+    annotation DAXLIB_PackageVersion = 0.1.3
