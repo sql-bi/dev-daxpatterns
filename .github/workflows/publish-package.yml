@@ -29,7 +29,7 @@ permissions:
 
 env:
   # Name of the forked daxlib repository (change if your fork has a different name)
-  DAXLIBFORK_NAME: ${{ github.repository_owner }}/daxlib
+  DAXLIBFORK_NAME: ${{ github.repository_owner }}/fork-daxlib
 
 jobs:
   publish:
