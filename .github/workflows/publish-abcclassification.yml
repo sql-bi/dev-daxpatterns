@@ -30,6 +30,7 @@ permissions:
 env:
   # Name of the forked daxlib repository (change if your fork has a different name)
   DAXLIBFORK_NAME: ${{ github.repository_owner }}/fork-daxlib
+  DAXPATTERN_NAME: AbcClassification
 
 jobs:
   publish:
@@ -62,10 +63,10 @@ jobs:
         id: package
         working-directory: source-repo
         run: |
-          PACKAGE_NAME=$(jq -r '.id' src/manifest.daxlib)
+          PACKAGE_NAME=$(jq -r '.id' src/${{ env.DAXPATTERN_NAME }}/manifest.daxlib)
           echo "name=${PACKAGE_NAME}" >> $GITHUB_OUTPUT
           echo "Package name: ${PACKAGE_NAME}"
-          PACKAGE_VERSION=$(jq -r '.version' src/manifest.daxlib)
+          PACKAGE_VERSION=$(jq -r '.version' src/${{ env.DAXPATTERN_NAME }}/manifest.daxlib)
           echo "version=${PACKAGE_VERSION}" >> $GITHUB_OUTPUT
           echo "Package version: ${PACKAGE_VERSION}"
           PACKAGE_FOLDER="packages/$(echo "${PACKAGE_NAME}" | cut -c1 | tr '[:upper:]' '[:lower:]')/$(echo "${PACKAGE_NAME}" | tr '[:upper:]' '[:lower:]')/${PACKAGE_VERSION}"
@@ -96,7 +97,7 @@ jobs:
 
       # Copy package files to the new folder
       - name: Copy package files
-        run: cp -rv source-repo/src/* "fork-repo/${{ steps.package.outputs.folder }}/"
+        run: cp -rv source-repo/src/${{ env.DAXPATTERN_NAME }}/* "fork-repo/${{ steps.package.outputs.folder }}/"
 
       # Commit changes. If there are no changes, this will fail and stop the workflow
       - name: Git commit changes
