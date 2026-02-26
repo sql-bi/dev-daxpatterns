@@ -4,6 +4,9 @@
   "version": "0.1.3",
   "authors": "SQLBI",
   "description": "Implementation of ABC Classification patterns using User Defined Functions.",
+  "releaseNotes": "Documentation update only; no functional changes.",
+  "projectUrl": "https://www.daxpatterns.com",
+  "repositoryUrl": "https://github.com/sql-bi/dev-daxpatterns",
   "tags": "DAX,UDF,FUNCTION,LIB,PATTERN,ABC",
   "icon": "/icon.png",
   "readme": "/README.md"
