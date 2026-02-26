@@ -11,7 +11,7 @@ Functions to implement the [ABC Classification](https://www.daxpatterns.com/abc-
 ## Function
 
 ```DAX
-ComputeInAbcClass (
+DaxPatterns.AbcClassification.ComputeInAbcClass (
     <valueExpr>,               -- e.g., [Sales Amount] (must be additive, SUM-based)
     <transactionsTable>,       -- e.g., Sales
     <itemTable>,               -- e.g., 'Product'
@@ -66,7 +66,7 @@ This matches the pattern described in DAX Patterns and its dynamic variant (clas
 
 ```DAX
 ABC Sales Amount =
-ComputeInAbcClass (
+DaxPatterns.AbcClassification.ComputeInAbcClass (
     [Sales Amount],
     Sales,
     'Product',
