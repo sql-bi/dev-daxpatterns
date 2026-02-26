@@ -11,14 +11,14 @@ Functions to implement the [ABC Classification](https://www.daxpatterns.com/abc-
 ## Function
 
 ```DAX
-ComputeInAbcClass (
+DaxPatterns.AbcClassification.ComputeInAbcClass (
     <valueExpr>,               -- e.g., [Sales Amount] (must be additive, SUM-based)
     <transactionsTable>,       -- e.g., Sales
     <itemTable>,               -- e.g., 'Product'
     <itemKeyColumn>,           -- e.g., 'Product'[ProductKey]
     <abcClassTable>,           -- e.g., 'ABC Classes' (disconnected)
     <abcLowerBoundaryColumn>,  -- e.g., 'ABC Classes'[Lower Boundary]  -- inclusive
-    <abcUpperBoundaryColumn]   -- e.g., 'ABC Classes'[Upper Boundary]  -- exclusive (see notes)
+    <abcUpperBoundaryColumn>   -- e.g., 'ABC Classes'[Upper Boundary]  -- exclusive (see notes)
 )
 ```
 
@@ -66,7 +66,7 @@ This matches the pattern described in DAX Patterns and its dynamic variant (clas
 
 ```DAX
 ABC Sales Amount =
-ComputeInAbcClass (
+DaxPatterns.AbcClassification.ComputeInAbcClass (
     [Sales Amount],
     Sales,
     'Product',
@@ -75,7 +75,6 @@ ComputeInAbcClass (
     'ABC Classes'[Lower Boundary], 
     'ABC Classes'[Upper Boundary]
 )
-
 ```
 
 These produce a **dynamic** ABC where class membership updates with filters (e.g., year, region).
