@@ -18,7 +18,7 @@ DaxPatterns.AbcClassification.ComputeInAbcClass (
     <itemKeyColumn>,           -- e.g., 'Product'[ProductKey]
     <abcClassTable>,           -- e.g., 'ABC Classes' (disconnected)
     <abcLowerBoundaryColumn>,  -- e.g., 'ABC Classes'[Lower Boundary]  -- inclusive
-    <abcUpperBoundaryColumn]   -- e.g., 'ABC Classes'[Upper Boundary]  -- exclusive (see notes)
+    <abcUpperBoundaryColumn>   -- e.g., 'ABC Classes'[Upper Boundary]  -- exclusive (see notes)
 )
 ```
 
@@ -75,7 +75,6 @@ DaxPatterns.AbcClassification.ComputeInAbcClass (
     'ABC Classes'[Lower Boundary], 
     'ABC Classes'[Upper Boundary]
 )
-
 ```
 
 These produce a **dynamic** ABC where class membership updates with filters (e.g., year, region).
