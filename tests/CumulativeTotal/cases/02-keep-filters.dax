@@ -1,0 +1,69 @@
+// RT Weekdays (V2): keep the filter on Day of Week
+// Requires: common/reference-measures.dax
+// Pass: Mismatches = 0 in every row. Checksum must match expected/<model>.json
+EVALUATE
+    // T02a: V2, CLASSIC
+    VAR T_T02a =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonth@@] ), "IsTotal" ), TREATAS ( { "Monday", "Saturday" }, 'Date'[Day of Week] ),
+            "Ref", [Ref RT Weekdays],
+            "New", DaxPatterns.CumulativeTotal.OverDates ( [Sales Amount], 'Date'[Date], Sales[Order Date], VALUES ( 'Date'[Day of Week] ) )
+        )
+    VAR R_T02a =
+        ROW (
+            "Test", "T02a",
+            "Rows", COUNTROWS ( T_T02a ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T02a,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T02a, [New] ), 2 )
+        )
+    // T02b: V2, WINDOW
+    VAR T_T02b =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonth@@] ), "IsTotal" ), TREATAS ( { "Monday", "Saturday" }, 'Date'[Day of Week] ),
+            "Ref", [Ref RT Weekdays],
+            "New", DaxPatterns.CumulativeTotal.OverDates ( [Sales Amount], 'Date'[Date], Sales[Order Date], VALUES ( 'Date'[Day of Week] ), , "WINDOW" )
+        )
+    VAR R_T02b =
+        ROW (
+            "Test", "T02b",
+            "Rows", COUNTROWS ( T_T02b ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T02b,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T02b, [New] ), 2 )
+        )
+    // T02c: Without keepFiltersTable the Day of Week filter is removed (same as V1)
+    VAR T_T02c =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonth@@] ), "IsTotal" ), TREATAS ( { "Monday", "Saturday" }, 'Date'[Day of Week] ),
+            "Ref", [Ref Sales Amount RT],
+            "New", DaxPatterns.CumulativeTotal.OverDates ( [Sales Amount], 'Date'[Date], Sales[Order Date] )
+        )
+    VAR R_T02c =
+        ROW (
+            "Test", "T02c",
+            "Rows", COUNTROWS ( T_T02c ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T02c,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T02c, [New] ), 2 )
+        )
+    RETURN
+        UNION ( R_T02a, R_T02b, R_T02c )

@@ -1,0 +1,10 @@
+    // Query-scoped columns: emulate the Customer Class of the article (sample file 07 02)
+    // Thresholds are smaller than in the article, so that the Contoso test models have customers in all the classes
+    COLUMN Customer[Customer Sales] =
+        CALCULATE ( SUMX ( Sales, Sales[Quantity] * Sales[Net Price] ) )
+    COLUMN Customer[Customer Class Number] =
+        VAR CustomerSales = Customer[Customer Sales]
+        RETURN
+            SWITCH ( TRUE (), ISBLANK ( CustomerSales ), BLANK (), CustomerSales < 1000, 1, CustomerSales < 5000, 2, CustomerSales < 20000, 3, 4 )
+    COLUMN Customer[Customer Class] =
+        SWITCH ( Customer[Customer Class Number], 1, "Silver", 2, "Gold", 3, "Platinum", 4, "Titanium" )

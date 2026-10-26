@@ -1,0 +1,7 @@
+    // V3 applied to 'Date'[Year Month] (Sort by Column = 'Date'[Year Month Number])
+    MEASURE Sales[Ref Sales Amount RT YearMonth] =
+        VAR LastVisible = MAX ( 'Date'[@@YearMonthNumber@@] )
+        VAR ToSum =
+            FILTER ( ALLSELECTED ( 'Date'[@@YearMonth@@], 'Date'[@@YearMonthNumber@@] ),
+                'Date'[@@YearMonthNumber@@] <= LastVisible )
+        RETURN CALCULATE ( [Sales Amount], ToSum )

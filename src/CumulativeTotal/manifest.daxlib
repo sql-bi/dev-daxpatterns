@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/daxlib/daxlib/refs/heads/main/schemas/manifest/1.0.0/manifest.1.0.0.schema.json",
+  "id": "DaxPatterns.CumulativeTotal",
+  "version": "0.1.0-beta",
+  "authors": "SQLBI",
+  "description": "Implementation of Cumulative total (running total) patterns using User Defined Functions.",
+  "releaseNotes": "First release: OverDates and OverSortedColumn, with optional start at selection and CLASSIC or WINDOW implementation.",
+  "projectUrl": "https://www.daxpatterns.com",
+  "repositoryUrl": "https://github.com/sql-bi/dev-daxpatterns",
+  "tags": "DAX,UDF,FUNCTION,LIB,PATTERN,CUMULATIVE,RUNNINGTOTAL",
+  "icon": "/icon.png",
+  "readme": "/README.md"
+}

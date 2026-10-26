@@ -1,0 +1,16 @@
+    // V3 Sales Amount RT Class (needs common/customer-class.dax)
+    MEASURE Sales[Ref Sales Amount RT Class] =
+        VAR LastVisibleClass = MAX ( Customer[Customer Class Number] )
+        VAR ClassesToSum =
+            FILTER ( ALLSELECTED ( Customer[Customer Class], Customer[Customer Class Number] ),
+                Customer[Customer Class Number] <= LastVisibleClass )
+        VAR Result = CALCULATE ( [Sales Amount], ClassesToSum )
+        RETURN Result
+    // V3 variation (not in the article): start at the first value of the table (ALL)
+    MEASURE Sales[Ref Sales Amount RT Class All] =
+        VAR LastVisibleClass = MAX ( Customer[Customer Class Number] )
+        VAR ClassesToSum =
+            FILTER ( ALL ( Customer[Customer Class], Customer[Customer Class Number] ),
+                Customer[Customer Class Number] <= LastVisibleClass )
+        VAR Result = CALCULATE ( [Sales Amount], ClassesToSum )
+        RETURN Result

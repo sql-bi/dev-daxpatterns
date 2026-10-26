@@ -1,0 +1,138 @@
+/// Return the cumulative total (running total) of an expression over dates
+/// Implement the Cumulative total pattern from DAX Patterns
+/// Article: https://www.daxpatterns.com/cumulative-total/
+/// The result includes all the dates up to the last visible date.
+/// The result starts at the first date of the date table, or at the first selected date (startAtSelection = TRUE).
+/// The function removes all the filters on the date table, then applies keepFiltersTable again.
+/// The function returns BLANK for the periods that start after the last date in lastDateColumn.
+/// @param {ANYREF EXPR} valueExpr - The expression to accumulate, e.g. [Sales Amount]. It must be additive.
+/// @param {COLUMNREF} dateColumn - The date column of the date table, e.g. 'Date'[Date]
+/// @param {COLUMNREF} lastDateColumn - The date column of the fact table, e.g. Sales[Order Date]. Use dateColumn to disable the check on the last date.
+/// @param {TABLE} keepFiltersTable - Optional. The filters on the date table to keep, e.g. VALUES ( 'Date'[Day of Week] ). Default: no filter.
+/// @param {BOOLEAN} startAtSelection - Optional. FALSE (default): start at the first date of the date table. TRUE: start at the first selected date.
+/// @param {STRING} implementation - Optional. "CLASSIC" (default): CALCULATE filter, faster with few cells (e.g. months). "WINDOW": WINDOW function, faster with many cells (e.g. days).
+/// @returns The value of valueExpr for the dates from the start date to the last visible date
+function 'DaxPatterns.CumulativeTotal.OverDates' = ```
+        (
+            valueExpr : ANYREF EXPR,
+            dateColumn : COLUMNREF,
+            lastDateColumn : COLUMNREF,
+            keepFiltersTable : TABLE VAL = { BLANK () },
+            startAtSelection : BOOLEAN = FALSE,
+            implementation : STRING = "CLASSIC"
+        ) =>
+            CALCULATE (
+                VAR LastVisibleDate = MAX ( dateColumn )
+                VAR FirstVisibleDate = MIN ( dateColumn )
+                VAR LastDateWithData =
+                    CALCULATE ( MAX ( lastDateColumn ), REMOVEFILTERS () )
+                VAR StartDate =
+                    IF (
+                        startAtSelection,
+                        CALCULATE ( MIN ( dateColumn ), ALLSELECTED ( TABLEOF ( dateColumn ) ) )
+                    )
+                VAR Result =
+                    IF (
+                        FirstVisibleDate <= LastDateWithData,
+                        SWITCH (
+                            implementation,
+                            "CLASSIC",
+                                CALCULATE (
+                                    valueExpr,
+                                    dateColumn >= StartDate && dateColumn <= LastVisibleDate,
+                                    REMOVEFILTERS ( TABLEOF ( dateColumn ) ),
+                                    keepFiltersTable
+                                ),
+                            "WINDOW",
+                                CALCULATE (
+                                    valueExpr,
+                                    WINDOW (
+                                        1, ABS, 0, REL,
+                                        FILTER ( ALL ( dateColumn ), dateColumn >= StartDate ),
+                                        ORDERBY ( dateColumn, ASC )
+                                    ),
+                                    REMOVEFILTERS ( TABLEOF ( dateColumn ) ),
+                                    keepFiltersTable
+                                ),
+                            ERROR ( "DaxPatterns.CumulativeTotal.OverDates: implementation must be CLASSIC or WINDOW" )
+                        )
+                    )
+                RETURN
+                    Result
+            )
+        ```
+    annotation DAXLIB_PackageId = __PLACEHOLDER_PACKAGE_ID__
+
+    annotation DAXLIB_PackageVersion = __PLACEHOLDER_PACKAGE_VERSION__
+
+/// Return the cumulative total (running total) of an expression over a column that you can sort
+/// Implement the "Cumulative total on columns that can be sorted" scenario of the Cumulative total pattern from DAX Patterns
+/// Article: https://www.daxpatterns.com/cumulative-total/
+/// The result includes all the values of orderColumn up to the last visible value.
+/// The function removes the filters on orderColumn and displayColumn only.
+/// @param {ANYREF EXPR} valueExpr - The expression to accumulate, e.g. [Sales Amount]. It must be additive.
+/// @param {COLUMNREF} orderColumn - The column that sets the order, e.g. Customer[Customer Class Number]
+/// @param {COLUMNREF} displayColumn - The column in the report that uses orderColumn as Sort by Column, e.g. Customer[Customer Class]. If there is no Sort by Column, use orderColumn again.
+/// @param {BOOLEAN} startAtSelection - Optional. TRUE (default): use only the selected values (ALLSELECTED). FALSE: start at the first value of the table (ALL).
+/// @param {STRING} implementation - Optional. "CLASSIC" (default): CALCULATE filter. "WINDOW": WINDOW function.
+/// @returns The value of valueExpr for the values of orderColumn up to the last visible value
+function 'DaxPatterns.CumulativeTotal.OverSortedColumn' = ```
+        (
+            valueExpr : ANYREF EXPR,
+            orderColumn : COLUMNREF,
+            displayColumn : COLUMNREF,
+            startAtSelection : BOOLEAN = TRUE,
+            implementation : STRING = "CLASSIC"
+        ) =>
+            CALCULATE (
+                VAR LastVisibleValue = MAX ( orderColumn )
+                VAR Result =
+                    SWITCH (
+                        implementation,
+                        "CLASSIC",
+                            IF (
+                                startAtSelection,
+                                CALCULATE (
+                                    valueExpr,
+                                    FILTER (
+                                        ALLSELECTED ( displayColumn, orderColumn ),
+                                        orderColumn <= LastVisibleValue
+                                    )
+                                ),
+                                CALCULATE (
+                                    valueExpr,
+                                    FILTER (
+                                        ALL ( displayColumn, orderColumn ),
+                                        orderColumn <= LastVisibleValue
+                                    )
+                                )
+                            ),
+                        "WINDOW",
+                            IF (
+                                startAtSelection,
+                                CALCULATE (
+                                    valueExpr,
+                                    WINDOW (
+                                        1, ABS, 0, REL,
+                                        ALLSELECTED ( displayColumn, orderColumn ),
+                                        ORDERBY ( orderColumn, ASC )
+                                    )
+                                ),
+                                CALCULATE (
+                                    valueExpr,
+                                    WINDOW (
+                                        1, ABS, 0, REL,
+                                        ALL ( displayColumn, orderColumn ),
+                                        ORDERBY ( orderColumn, ASC )
+                                    )
+                                )
+                            ),
+                        ERROR ( "DaxPatterns.CumulativeTotal.OverSortedColumn: implementation must be CLASSIC or WINDOW" )
+                    )
+                RETURN
+                    Result
+            )
+        ```
+    annotation DAXLIB_PackageId = __PLACEHOLDER_PACKAGE_ID__
+
+    annotation DAXLIB_PackageVersion = __PLACEHOLDER_PACKAGE_VERSION__
