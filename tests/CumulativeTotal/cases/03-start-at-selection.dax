@@ -1,0 +1,69 @@
+// OverDates with startAtSelection = TRUE
+// Requires: common/reference-measures.dax
+// Pass: Mismatches = 0 in every row. Checksum must match expected/<model>.json
+EVALUATE
+    // T03a: Year 2024 selected, CLASSIC
+    VAR T_T03a =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonth@@] ), "IsTotal" ), TREATAS ( { @@SelectedYear@@ }, 'Date'[@@Year@@] ),
+            "Ref", [Ref Sales Amount RT From Selection],
+            "New", DaxPatterns.CumulativeTotal.OverDates ( [Sales Amount], 'Date'[Date], Sales[Order Date], , TRUE )
+        )
+    VAR R_T03a =
+        ROW (
+            "Test", "T03a",
+            "Rows", COUNTROWS ( T_T03a ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T03a,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T03a, [New] ), 2 )
+        )
+    // T03b: Year 2024 selected, WINDOW
+    VAR T_T03b =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonth@@] ), "IsTotal" ), TREATAS ( { @@SelectedYear@@ }, 'Date'[@@Year@@] ),
+            "Ref", [Ref Sales Amount RT From Selection],
+            "New", DaxPatterns.CumulativeTotal.OverDates ( [Sales Amount], 'Date'[Date], Sales[Order Date], , TRUE, "WINDOW" )
+        )
+    VAR R_T03b =
+        ROW (
+            "Test", "T03b",
+            "Rows", COUNTROWS ( T_T03b ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T03b,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T03b, [New] ), 2 )
+        )
+    // T03c: No selection: same result as the default
+    VAR T_T03c =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonth@@] ), "IsTotal" ),
+            "Ref", [Ref Sales Amount RT],
+            "New", DaxPatterns.CumulativeTotal.OverDates ( [Sales Amount], 'Date'[Date], Sales[Order Date], , TRUE )
+        )
+    VAR R_T03c =
+        ROW (
+            "Test", "T03c",
+            "Rows", COUNTROWS ( T_T03c ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T03c,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T03c, [New] ), 2 )
+        )
+    RETURN
+        UNION ( R_T03a, R_T03b, R_T03c )

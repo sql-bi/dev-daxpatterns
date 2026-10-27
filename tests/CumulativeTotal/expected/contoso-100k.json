@@ -1,0 +1,106 @@
+{
+  "T01a": {
+    "Rows": 117,
+    "Checksum": 10360571776.68
+  },
+  "T01b": {
+    "Rows": 117,
+    "Checksum": 10360571776.68
+  },
+  "T01c": {
+    "Rows": 117,
+    "Checksum": 10360571776.68
+  },
+  "T01d": {
+    "Rows": 3516,
+    "Checksum": 305798858917.38
+  },
+  "T01e": {
+    "Rows": 3516,
+    "Checksum": 305798858917.38
+  },
+  "T01f": {
+    "Rows": 13,
+    "Checksum": 2294711504.9
+  },
+  "T01g": {
+    "Rows": 13,
+    "Checksum": 2294711504.9
+  },
+  "T01h": {
+    "Rows": 117,
+    "Checksum": 30258806.0
+  },
+  "T02a": {
+    "Rows": 117,
+    "Checksum": 3509447438.27
+  },
+  "T02b": {
+    "Rows": 117,
+    "Checksum": 3509447438.27
+  },
+  "T02c": {
+    "Rows": 117,
+    "Checksum": 10348295624.63
+  },
+  "T03a": {
+    "Rows": 13,
+    "Checksum": 242046718.59
+  },
+  "T03b": {
+    "Rows": 13,
+    "Checksum": 242046718.59
+  },
+  "T03c": {
+    "Rows": 117,
+    "Checksum": 10360571776.68
+  },
+  "T04a": {
+    "Rows": 5,
+    "Checksum": 705779986.32
+  },
+  "T04b": {
+    "Rows": 5,
+    "Checksum": 705779986.32
+  },
+  "T04c": {
+    "Rows": 4,
+    "Checksum": 336150638.43
+  },
+  "T04d": {
+    "Rows": 4,
+    "Checksum": 336150638.43
+  },
+  "T04e": {
+    "Rows": 4,
+    "Checksum": 699910461.04
+  },
+  "T04f": {
+    "Rows": 4,
+    "Checksum": 699910461.04
+  },
+  "T05a": {
+    "Rows": 13,
+    "Checksum": 327015404.61
+  },
+  "T05b": {
+    "Rows": 13,
+    "Checksum": 327015404.61
+  },
+  "T06a": {
+    "Rows": 11,
+    "Checksum": 949735518.36
+  },
+  "T06b": {
+    "Rows": 11,
+    "Checksum": 949735518.36
+  },
+  "T06c": {
+    "Rows": 132,
+    "Checksum": 12767530966.1
+  },
+  "07-invalid-implementation": {
+    "Rows": 0,
+    "Checksum": 0
+  }
+}

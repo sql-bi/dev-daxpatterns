@@ -1,0 +1,4 @@
+// T07a: an invalid value of implementation raises an error (IFERROR cannot catch it)
+// ExpectError: implementation must be CLASSIC or WINDOW
+EVALUATE
+    { DaxPatterns.CumulativeTotal.OverDates ( [Sales Amount], 'Date'[Date], Sales[Order Date], , , "BAD" ) }

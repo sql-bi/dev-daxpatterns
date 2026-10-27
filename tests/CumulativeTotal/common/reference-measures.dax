@@ -1,0 +1,47 @@
+    // Reference measures: original DAX of https://www.daxpatterns.com/cumulative-total/
+    // V1 Sales Amount RT (date table marked as date table)
+    MEASURE Sales[Ref Sales Amount RT] =
+        VAR LastVisibleDate = MAX ( 'Date'[Date] )
+        VAR FirstVisibleDate = MIN ( 'Date'[Date] )
+        VAR LastDateWithSales = CALCULATE ( MAX ( 'Sales'[Order Date] ), REMOVEFILTERS () )
+        VAR Result =
+            IF ( FirstVisibleDate <= LastDateWithSales,
+                CALCULATE ( [Sales Amount], 'Date'[Date] <= LastVisibleDate ) )
+        RETURN Result
+    // V1b date table not marked as date table
+    MEASURE Sales[Ref Sales Amount RT NoMark] =
+        VAR LastVisibleDate = MAX ( 'Date'[Date] )
+        VAR FirstVisibleDate = MIN ( 'Date'[Date] )
+        VAR LastDateWithSales = CALCULATE ( MAX ( 'Sales'[Order Date] ), REMOVEFILTERS () )
+        VAR Result =
+            IF ( FirstVisibleDate <= LastDateWithSales,
+                CALCULATE ( [Sales Amount], 'Date'[Date] <= LastVisibleDate, REMOVEFILTERS ( 'Date' ) ) )
+        RETURN Result
+    // V2 RT Weekdays
+    MEASURE Sales[Ref RT Weekdays] =
+        VAR LastVisibleDate = MAX ( 'Date'[Date] )
+        VAR FirstVisibleDate = MIN ( 'Date'[Date] )
+        VAR LastDateWithSales = CALCULATE ( MAX ( 'Sales'[Order Date] ), REMOVEFILTERS () )
+        VAR Result =
+            IF ( FirstVisibleDate <= LastDateWithSales,
+                CALCULATE ( [Sales Amount], 'Date'[Date] <= LastVisibleDate, VALUES ( 'Date'[Day of Week] ) ) )
+        RETURN Result
+    // V1 variation (not in the article): start at the first selected date
+    MEASURE Sales[Ref Sales Amount RT From Selection] =
+        VAR LastVisibleDate = MAX ( 'Date'[Date] )
+        VAR FirstVisibleDate = MIN ( 'Date'[Date] )
+        VAR FirstSelectedDate = CALCULATE ( MIN ( 'Date'[Date] ), ALLSELECTED ( 'Date' ) )
+        VAR LastDateWithSales = CALCULATE ( MAX ( 'Sales'[Order Date] ), REMOVEFILTERS () )
+        VAR Result =
+            IF ( FirstVisibleDate <= LastDateWithSales,
+                CALCULATE ( [Sales Amount], 'Date'[Date] >= FirstSelectedDate && 'Date'[Date] <= LastVisibleDate ) )
+        RETURN Result
+    // V1 with an expression instead of a measure
+    MEASURE Sales[Ref Quantity RT] =
+        VAR LastVisibleDate = MAX ( 'Date'[Date] )
+        VAR FirstVisibleDate = MIN ( 'Date'[Date] )
+        VAR LastDateWithSales = CALCULATE ( MAX ( 'Sales'[Order Date] ), REMOVEFILTERS () )
+        VAR Result =
+            IF ( FirstVisibleDate <= LastDateWithSales,
+                CALCULATE ( SUM ( Sales[Quantity] ), 'Date'[Date] <= LastVisibleDate ) )
+        RETURN Result

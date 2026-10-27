@@ -1,0 +1,48 @@
+// OverSortedColumn on a date attribute with Sort by Column
+// Requires: common/reference-measures.dax, common/reference-measures-yearmonth.dax
+// Pass: Mismatches = 0 in every row. Checksum must match expected/<model>.json
+EVALUATE
+    // T05a: Year Month, year 2023, CLASSIC
+    VAR T_T05a =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonth@@] ), "IsTotal" ), TREATAS ( { @@OtherYear@@ }, 'Date'[@@Year@@] ),
+            "Ref", [Ref Sales Amount RT YearMonth],
+            "New", DaxPatterns.CumulativeTotal.OverSortedColumn ( [Sales Amount], 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonth@@] )
+        )
+    VAR R_T05a =
+        ROW (
+            "Test", "T05a",
+            "Rows", COUNTROWS ( T_T05a ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T05a,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T05a, [New] ), 2 )
+        )
+    // T05b: Year Month, year 2023, WINDOW
+    VAR T_T05b =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonth@@] ), "IsTotal" ), TREATAS ( { @@OtherYear@@ }, 'Date'[@@Year@@] ),
+            "Ref", [Ref Sales Amount RT YearMonth],
+            "New", DaxPatterns.CumulativeTotal.OverSortedColumn ( [Sales Amount], 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonth@@], , "WINDOW" )
+        )
+    VAR R_T05b =
+        ROW (
+            "Test", "T05b",
+            "Rows", COUNTROWS ( T_T05b ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T05b,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T05b, [New] ), 2 )
+        )
+    RETURN
+        UNION ( R_T05a, R_T05b )

@@ -1,0 +1,132 @@
+// Cumulative total on columns that can be sorted (V3)
+// Requires: common/reference-measures.dax, common/customer-class.dax, common/reference-measures-class.dax
+// Pass: Mismatches = 0 in every row. Checksum must match expected/<model>.json
+EVALUATE
+    // T04a: V3, CLASSIC
+    VAR T_T04a =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( Customer[Customer Class Number], Customer[Customer Class] ), "IsTotal" ),
+            "Ref", [Ref Sales Amount RT Class],
+            "New", DaxPatterns.CumulativeTotal.OverSortedColumn ( [Sales Amount], Customer[Customer Class Number], Customer[Customer Class] )
+        )
+    VAR R_T04a =
+        ROW (
+            "Test", "T04a",
+            "Rows", COUNTROWS ( T_T04a ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T04a,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T04a, [New] ), 2 )
+        )
+    // T04b: V3, WINDOW
+    VAR T_T04b =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( Customer[Customer Class Number], Customer[Customer Class] ), "IsTotal" ),
+            "Ref", [Ref Sales Amount RT Class],
+            "New", DaxPatterns.CumulativeTotal.OverSortedColumn ( [Sales Amount], Customer[Customer Class Number], Customer[Customer Class], , "WINDOW" )
+        )
+    VAR R_T04b =
+        ROW (
+            "Test", "T04b",
+            "Rows", COUNTROWS ( T_T04b ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T04b,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T04b, [New] ), 2 )
+        )
+    // T04c: V3 with a selection of classes and a filter on Gender, CLASSIC
+    VAR T_T04c =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( Customer[Customer Class Number], Customer[Customer Class] ), "IsTotal" ), TREATAS ( { 2, 3, 4 }, Customer[Customer Class Number] ), TREATAS ( { @@Female@@ }, Customer[Gender] ),
+            "Ref", [Ref Sales Amount RT Class],
+            "New", DaxPatterns.CumulativeTotal.OverSortedColumn ( [Sales Amount], Customer[Customer Class Number], Customer[Customer Class] )
+        )
+    VAR R_T04c =
+        ROW (
+            "Test", "T04c",
+            "Rows", COUNTROWS ( T_T04c ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T04c,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T04c, [New] ), 2 )
+        )
+    // T04d: V3 with selection, WINDOW
+    VAR T_T04d =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( Customer[Customer Class Number], Customer[Customer Class] ), "IsTotal" ), TREATAS ( { 2, 3, 4 }, Customer[Customer Class Number] ), TREATAS ( { @@Female@@ }, Customer[Gender] ),
+            "Ref", [Ref Sales Amount RT Class],
+            "New", DaxPatterns.CumulativeTotal.OverSortedColumn ( [Sales Amount], Customer[Customer Class Number], Customer[Customer Class], , "WINDOW" )
+        )
+    VAR R_T04d =
+        ROW (
+            "Test", "T04d",
+            "Rows", COUNTROWS ( T_T04d ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T04d,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T04d, [New] ), 2 )
+        )
+    // T04e: startAtSelection = FALSE: start at the first class of the table, CLASSIC
+    VAR T_T04e =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( Customer[Customer Class Number], Customer[Customer Class] ), "IsTotal" ), TREATAS ( { 2, 3, 4 }, Customer[Customer Class Number] ),
+            "Ref", [Ref Sales Amount RT Class All],
+            "New", DaxPatterns.CumulativeTotal.OverSortedColumn ( [Sales Amount], Customer[Customer Class Number], Customer[Customer Class], FALSE )
+        )
+    VAR R_T04e =
+        ROW (
+            "Test", "T04e",
+            "Rows", COUNTROWS ( T_T04e ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T04e,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T04e, [New] ), 2 )
+        )
+    // T04f: startAtSelection = FALSE, WINDOW
+    VAR T_T04f =
+        SUMMARIZECOLUMNS (
+            ROLLUPADDISSUBTOTAL ( ROLLUPGROUP ( Customer[Customer Class Number], Customer[Customer Class] ), "IsTotal" ), TREATAS ( { 2, 3, 4 }, Customer[Customer Class Number] ),
+            "Ref", [Ref Sales Amount RT Class All],
+            "New", DaxPatterns.CumulativeTotal.OverSortedColumn ( [Sales Amount], Customer[Customer Class Number], Customer[Customer Class], FALSE, "WINDOW" )
+        )
+    VAR R_T04f =
+        ROW (
+            "Test", "T04f",
+            "Rows", COUNTROWS ( T_T04f ),
+            "Mismatches",
+                COUNTROWS (
+                    FILTER (
+                        T_T04f,
+                        NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) )
+                            && ( ISBLANK ( [Ref] ) || ISBLANK ( [New] ) || ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) )
+                    )
+                ) + 0,
+            "Checksum", ROUND ( SUMX ( T_T04f, [New] ), 2 )
+        )
+    RETURN
+        UNION ( R_T04a, R_T04b, R_T04c, R_T04d, R_T04e, R_T04f )

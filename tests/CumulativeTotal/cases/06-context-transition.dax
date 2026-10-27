@@ -1,0 +1,31 @@
+// The functions wrap their body in CALCULATE: a direct call inside an iterator gives the same result as a measure
+// Requires: common/reference-measures.dax
+// Pass: Mismatches = 0 in every row
+// T06a: expression argument (no measure) in ADDCOLUMNS; T06b: WINDOW in ADDCOLUMNS;
+// T06c: OverSortedColumn in ADDCOLUMNS (direct call = same call in a measure)
+    MEASURE Sales[T06c Ref] = DaxPatterns.CumulativeTotal.OverSortedColumn ( [Sales Amount], 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonthNumber@@], FALSE )
+EVALUATE
+    VAR T06a =
+        ADDCOLUMNS (
+            VALUES ( 'Date'[@@Year@@] ),
+            "Ref", [Ref Sales Amount RT],
+            "New", DaxPatterns.CumulativeTotal.OverDates ( SUMX ( Sales, Sales[Quantity] * Sales[Net Price] ), 'Date'[Date], Sales[Order Date] )
+        )
+    VAR T06b =
+        ADDCOLUMNS (
+            VALUES ( 'Date'[@@Year@@] ),
+            "Ref", [Ref Sales Amount RT],
+            "New", DaxPatterns.CumulativeTotal.OverDates ( [Sales Amount], 'Date'[Date], Sales[Order Date], , , "WINDOW" )
+        )
+    VAR T06c =
+        ADDCOLUMNS (
+            VALUES ( 'Date'[@@YearMonthNumber@@] ),
+            "Ref", [T06c Ref],
+            "New", DaxPatterns.CumulativeTotal.OverSortedColumn ( [Sales Amount], 'Date'[@@YearMonthNumber@@], 'Date'[@@YearMonthNumber@@], FALSE )
+        )
+    RETURN
+        UNION (
+            ROW ( "Test", "T06a", "Rows", COUNTROWS ( T06a ), "Mismatches", COUNTROWS ( FILTER ( T06a, ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) ) ) + 0, "Checksum", ROUND ( SUMX ( T06a, [New] ), 2 ) ),
+            ROW ( "Test", "T06b", "Rows", COUNTROWS ( T06b ), "Mismatches", COUNTROWS ( FILTER ( T06b, ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) ) ) + 0, "Checksum", ROUND ( SUMX ( T06b, [New] ), 2 ) ),
+            ROW ( "Test", "T06c", "Rows", COUNTROWS ( T06c ), "Mismatches", COUNTROWS ( FILTER ( T06c, NOT ( ISBLANK ( [Ref] ) && ISBLANK ( [New] ) ) && ABS ( [Ref] - [New] ) > 0.000001 * MAX ( 1, ABS ( [Ref] ) ) ) ) + 0, "Checksum", ROUND ( SUMX ( T06c, [New] ), 2 ) )
+        )
